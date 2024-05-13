@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Messages;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class MessagesController extends Controller
         try {
             $user = $request->user('api');
             if($user) {
-                $messages = Messages::where('receiverId', '=', $user->id)->get(['senderId', 'title']); //Ajustar para ver nombre del sender. Usa el DB que usaste en el otro proyecto
+                $messages = DB::table('messages')->join('users', 'users.id', 'messages.senderId')->select('messages.id','users.name', 'title')->where('receiverId', '=', $user->id)->get();
                 return response()->json($messages);
             }
             else {
@@ -27,7 +28,7 @@ class MessagesController extends Controller
         try {
             $user = $request->user('api');
             if($user) {
-                $message = Messages::where('id', '=', $messageId)->get(); //Ajustar para ver nombre del sender. Usa el DB que usaste en el otro proyecto
+                $message = DB::table('messages')->join('users', 'users.id', 'messages.senderId')->select('messages.id','users.name', 'title', 'text')->where('messages.id', '=', $messageId)->where('receiverId', '=', $user->id)->get();
                 return response()->json($message);
             }
             else {

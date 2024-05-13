@@ -23,6 +23,7 @@ use App\Http\Controllers\MessagesController;
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('/profile/{userName}', [AuthController::class, 'seeProfile']);
 
     Route::get('/friends', [FriendsController::class, 'getFriends']);
     Route::post('/friends/{userId}', [FriendsController::class, 'sendFriendRequest']);

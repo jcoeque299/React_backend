@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Posts;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostsController extends Controller
 {
     public function getAllPosts(){
-        $posts = Posts::orderBy("created_at","desc")->get();
+        $posts = DB::table('posts')->join('users', 'users.id', 'posts.userId')->select('posts.id','users.name', 'title')->get();
         return response()->json($posts);
     }
 
     public function getPost($postId) {
-        $post = Posts::where('id', '=', $postId)->get();
+        $post = DB::table('posts')->join('users', 'users.id', 'posts.userId')->select('posts.id','users.name', 'title', 'text')->where('posts.id', '=', $postId)->get();
         return response()->json($post);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Friends;
 use DateTime;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -55,6 +56,23 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
             ]);
+        }
+        else {
+            return response()->json(['message'=> 'Usuario no autenticado', 'statusCode' => 401],401);
+        }
+    }
+
+    public function seeProfile(Request $request, $userName) {
+        $user = $request->user();
+        if($user) {
+            $profile = User::where('name', '=', $userName)->first();
+            $isProfileFriended = Friends::where('accepted', '=', true)->where('parentId', '=', $profile->id)->orWhere('childId', '=', $profile->id);
+            if ($isProfileFriended->count()) {
+                return response()->json(['id' => $profile->id,'name' => $profile->name]);
+            }
+            else {
+                return response()->json(['message' => 'Este usuario no esta en tu lista de amigos', 'statusCode' => 403],403);
+            }
         }
         else {
             return response()->json(['message'=> 'Usuario no autenticado', 'statusCode' => 401],401);

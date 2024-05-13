@@ -12,8 +12,10 @@ class FriendsController extends Controller
         try {
             $user = $request->user('api');
             if($user) {
-                $friends = Friends::where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->get();
-                return response()->json($friends);
+                $friendsParent = DB::table('friends')->join('users as parentUser', 'parentUser.id', 'friends.parentId')->select('parentUser.name')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->first()->name;
+                $friendsChild = DB::table('friends')->join('users as childUser', 'childUser.id', 'friends.childId')->select('childUser.name')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->first()->name;
+                $accepted = DB::table('friends')->select('accepted')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->first()->accepted;
+                return response()->json(['parentName' => $friendsParent, 'childName' => $friendsChild, 'accepted' => $accepted]);
             }
             else {
                 return response()->json(['message'=> 'Usuario no autenticado', 'statusCode' => 401],401);
