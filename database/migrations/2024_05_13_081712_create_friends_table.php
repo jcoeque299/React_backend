@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('childId');
             $table->foreign('childId')->references('id')->on('users');
             $table->timestamps();
+            $table->boolean('accepted')->default(false);
             $table->primary(['parentId', 'childId']);
         });
     }
