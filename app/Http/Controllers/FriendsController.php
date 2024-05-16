@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Friends;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class FriendsController extends Controller
@@ -26,13 +27,14 @@ class FriendsController extends Controller
         }
     }
 
-    public function sendFriendRequest(Request $request, $userId) {
+    public function sendFriendRequest(Request $request, $userName) {
         try {
             $user = $request->user('api');
             if($user) {
+                $friendId = User::where('name', '=', $userName)->first('id');
                 $friendRequest = new Friends();
                 $friendRequest->parentId = $user->id;
-                $friendRequest->childId = $userId;
+                $friendRequest->childId = $friendId->id;
                 $friendRequest->save();
                 return response()->json($friendRequest,201);
             }
