@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Messages;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class MessagesController extends Controller
         try {
             $user = $request->user('api');
             if($user) {
-                $message = DB::table('messages')->join('users', 'users.id', 'messages.senderId')->select('messages.id','users.name', 'title', 'text')->where('messages.id', '=', $messageId)->where('receiverId', '=', $user->id)->get();
+                $message = DB::table('messages')->join('users', 'users.id', 'messages.senderId')->select('messages.id','users.name', 'title', 'text')->where('messages.id', '=', $messageId)->where('receiverId', '=', $user->id)->first();
                 return response()->json($message);
             }
             else {
@@ -40,7 +41,7 @@ class MessagesController extends Controller
         }
     }
 
-    public function sendMessage(Request $request, $userId) {
+    public function sendMessage(Request $request, $userName) {
         try {
             $user = $request->user();
                 if($user) {
@@ -48,10 +49,11 @@ class MessagesController extends Controller
                         'title' => 'required|string',
                         'text' => 'required|string',
                     ]);
+                    $userId = User::where('name', '=', $userName)->first('id');
                     $message = new Messages();
                     $message->title = $request->input('title');
                     $message->text = $request->input('text');
-                    $message->receiverId = $userId;
+                    $message->receiverId = $userId->id;
                     $message->senderId = $user->id;
                     $message->save();
                     return response()->json($message,201);

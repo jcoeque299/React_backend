@@ -27,12 +27,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/friends', [FriendsController::class, 'getFriends']);
     Route::post('/friends/{userName}', [FriendsController::class, 'sendFriendRequest']);
-    Route::put('/friends/{userId}', [FriendsController::class, 'acceptRequest']);
-    Route::delete('/friends/{userId}', [FriendsController::class, 'removeFriend']);
+    Route::put('/friends/{userName}', [FriendsController::class, 'acceptRequest']);
+    Route::delete('/friends/{userName}', [FriendsController::class, 'removeFriend']);
 
     Route::get('/messages', [MessagesController::class, 'getAllMessages']);
     Route::get('/messages/{messageId}', [MessagesController::class, 'getMessage']);
-    Route::post('/messages/{userId}', [MessagesController::class, 'sendMessage']);
+    Route::post('/messages/{userName}', [MessagesController::class, 'sendMessage']);
     Route::delete('/messages/{messageId}', [MessagesController::class, 'removeMessage']);
 
     Route::post('/posts', [PostsController::class, 'sendPost']);

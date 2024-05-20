@@ -10,22 +10,23 @@ use Illuminate\Support\Facades\DB;
 class FriendsController extends Controller
 {
     public function getFriends(Request $request) {
-        try {
+        // try {
             $user = $request->user('api');
             if($user) {
-                $friendsParent = DB::table('friends')->join('users as parentUser', 'parentUser.id', 'friends.parentId')->select('parentUser.name')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->first()->name;
-                $friendsChild = DB::table('friends')->join('users as childUser', 'childUser.id', 'friends.childId')->select('childUser.name')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->first()->name;
-                $accepted = DB::table('friends')->select('accepted')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->first()->accepted;
-                return response()->json(['parentName' => $friendsParent, 'childName' => $friendsChild, 'accepted' => $accepted]);
+                $friends = DB::table('friends')->join('users as parentUser', 'parentUser.id', 'friends.parentId')->join('users as childUser', 'childUser.id', 'friends.childId')->select('parentUser.name as parentName', 'childUser.name as childName', 'accepted')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->get();
+                if(!$friends) {
+                    return response()->json([]);
+                }
+                return response()->json($friends);
             }
             else {
                 return response()->json(['message'=> 'Usuario no autenticado', 'statusCode' => 401],401);
             }
         }
-        catch(\Exception $e) {
-            return response()->json(['error' => 'Error en el formato de la request', 'statusCode' => 400], 400);
-        }
-    }
+    //     catch(\Exception $e) {
+    //         return response()->json(['error' => 'Error en el formato de la request', 'statusCode' => 400], 400);
+    //     }
+    // }
 
     public function sendFriendRequest(Request $request, $userName) {
         try {
@@ -47,11 +48,12 @@ class FriendsController extends Controller
         }
     }
 
-    public function acceptRequest(Request $request, $userId) {
+    public function acceptRequest(Request $request, $userName) {
         try {
             $user = $request->user('api');
             if($user) {
-                DB::table('friends')->where('childId', '=', $user->id)->where('parentId', '=', $userId)->update(['accepted' => true]);
+                $userId = User::where('name', '=', $userName)->first('id');
+                DB::table('friends')->where('childId', '=', $user->id)->where('parentId', '=', $userId->id)->update(['accepted' => true]);
                 return response()->json(['message' => 'Solicitud de amistad aceptada', 'statusCode' => 200],200);
             }
             else {
@@ -63,11 +65,12 @@ class FriendsController extends Controller
         }
     }
 
-    public function removeFriend(Request $request, $userId) {
+    public function removeFriend(Request $request, $userName) {
         try {
             $user = $request->user('api');
             if($user) {
-                DB::table('friends')->where('childId', '=', $user->id)->where('parentId', '=', $userId)->delete();
+                $userId = User::where('name', '=', $userName)->first('id');
+                DB::table('friends')->where('childId', '=', $user->id)->where('parentId', '=', $userId->id)->delete();
                 return response()->json(['message' => 'Amistad borrada con exito', 'statusCode' => 200],200);
             }
             else {
