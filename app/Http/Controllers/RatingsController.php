@@ -19,12 +19,16 @@ class RatingsController extends Controller
                 $request->validate([
                     'score' => 'required|integer',
                 ]);
-                $rating = new Ratings();
-                $rating->score = $request->input('score');
-                $rating->bookId = $bookId;
-                $rating->userId = $user->id;
-                $rating->save();
-                return response()->json($rating,201);
+                $alreadyRated = Ratings::where('bookId', '=', $bookId)->where('userId', '=', $user->id);
+                if (!$alreadyRated->count()) {
+                    $rating = new Ratings();
+                    $rating->score = $request->input('score');
+                    $rating->bookId = $bookId;
+                    $rating->userId = $user->id;
+                    $rating->save();
+                    return response()->json($rating,201);
+                }
+                $alreadyRated->update(['score' => $request->input('score')]);
             }
             else {
                 return response()->json(['message'=> 'Usuario no autenticado', 'statusCode' => 401],401);

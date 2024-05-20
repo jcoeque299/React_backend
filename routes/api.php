@@ -3,6 +3,7 @@
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\RatingsController;
+use App\Http\Controllers\SavedController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -40,6 +41,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/comments/{postId}', [CommentsController::class, 'sendComment']);
 
     Route::post('/ratings/{bookId}', [RatingsController::class, 'sendRating']);
+
+    Route::get('/saved', [SavedController::class, 'getSaved']);
+    Route::post('/saved/{bookId}', [SavedController::class, 'save']);
+    Route::delete('/saved/{bookId}', [SavedController::class, 'delete']);
 });
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');

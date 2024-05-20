@@ -14,7 +14,7 @@ class PostsController extends Controller
     }
 
     public function getPost($postId) {
-        $post = DB::table('posts')->join('users', 'users.id', 'posts.userId')->select('posts.id','users.name', 'title', 'text')->where('posts.id', '=', $postId)->get();
+        $post = DB::table('posts')->join('users', 'users.id', 'posts.userId')->select('posts.id','users.name', 'title', 'text')->where('posts.id', '=', $postId)->first();
         return response()->json($post);
     }
 

@@ -9,7 +9,7 @@ use App\Models\Comments;
 class CommentsController extends Controller
 {
     public function getComments($postId){
-        $comments = DB::table("comments")->join("users", "users.id", "comments.userId")->select("comments.text", "users.name")->where("postId", "=", $postId)->get();
+        $comments = DB::table("comments")->join("users", "users.id", "comments.userId")->select("comments.id","comments.text", "users.name")->where("postId", "=", $postId)->get();
         return response()->json($comments);
     }
 

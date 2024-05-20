@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class FriendsController extends Controller
 {
     public function getFriends(Request $request) {
-        // try {
+        try {
             $user = $request->user('api');
             if($user) {
                 $friends = DB::table('friends')->join('users as parentUser', 'parentUser.id', 'friends.parentId')->join('users as childUser', 'childUser.id', 'friends.childId')->select('parentUser.name as parentName', 'childUser.name as childName', 'accepted')->where('parentId', '=', $user->id)->orWhere('childId', '=', $user->id)->get();
@@ -23,10 +23,10 @@ class FriendsController extends Controller
                 return response()->json(['message'=> 'Usuario no autenticado', 'statusCode' => 401],401);
             }
         }
-    //     catch(\Exception $e) {
-    //         return response()->json(['error' => 'Error en el formato de la request', 'statusCode' => 400], 400);
-    //     }
-    // }
+        catch(\Exception $e) {
+            return response()->json(['error' => 'Error en el formato de la request', 'statusCode' => 400], 400);
+        }
+    }
 
     public function sendFriendRequest(Request $request, $userName) {
         try {
